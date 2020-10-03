@@ -6,9 +6,9 @@ import threading
 class Server:
     def __init__(self):
         self.ip = socket.gethostbyname(socket.gethostname()) # get ip of the server
-        while 1: # infinate loop
+        while 1: # infinite loop
             try:
-                self.port = int(input('Enter port number to run on --> ')) # as for a port
+                self.port = int(input('Enter port number --> ')) # as for a port
 
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # create a new socket AF_INET = address family , socket type = SOCK_STREAM.
                 self.s.bind((self.ip, self.port)) # bind the socket to the port. if the port is already has been socketed it will send error.
