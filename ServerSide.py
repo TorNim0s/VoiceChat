@@ -1,6 +1,7 @@
 import socket
 import threading
 
+clients = []
 
 class Server:
     def __init__(self):
@@ -27,8 +28,19 @@ class Server:
 
         while True:
             c, addr = self.s.accept()
+            print("Accepted a connection request from %s:%s" % (addr[0], addr[1]));
 
             self.connections.append(c)
+
+            client_name = c.recv(1024)
+
+            print(client_name.decode());
+
+            clients.append(client_name.decode())
+
+            data = "accounts|" + "|".join(clients)
+
+            c.send(data.encode());
 
             threading.Thread(target=self.handle_client, args=(c, addr,)).start()
 

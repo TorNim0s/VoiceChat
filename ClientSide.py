@@ -14,13 +14,11 @@ class Client:
 
             self.canvas = canvas
 
+            self.users = []
+
             self.login_screen = login_screen
 
             self.s.connect((self.target_ip, self.target_port))
-
-            output = tk.Label(self.login_screen)
-            output.config(font=('David', 10), fg="firebrick2", bg="gray86", text="Connected")
-            self.canvas.create_window(200, 200, window=output)
 
         except:
             print("Couldn't connect to server")
@@ -29,6 +27,15 @@ class Client:
             self.canvas.create_window(200, 200, window=output)
 
             return
+
+        self.s.send(self.name.encode())
+
+        # Receive data from server
+        data_users = self.s.recv(1024).decode()
+        self.users = data_users.split("|")
+        self.users.remove("accounts")
+
+        print(self.users)
 
         chunk_size = 1024  # 512
         audio_format = pyaudio.paInt16
@@ -49,13 +56,30 @@ class Client:
 
         send_thread = threading.Thread(target=self.send_data_to_server).start()
 
-        App_screen(self, self.name)
+        update_app_thread = threading.Thread(target=self.update_app_screen).start()
+
+        self.app = App_screen(self, self.name, self.users)
+
+    def update_app_screen(self):
+        while True:
+            try:
+                data = self.s.recv(1024).decode()
+                print(data)
+                if ("accounts" in data):
+                    print("test2")
+                    self.users = data.split("|")
+                    self.users.remove("accounts")
+                    self.app.destroy
+                    self.app = App_screen(self, self.name, self.users)
+            except:
+                pass
 
     def receive_server_data(self):
         while True:
             try:
                 data = self.s.recv(1024)
-                self.playing_stream.write(data)
+                if ("accounts" not in data.decode()):
+                    self.playing_stream.write(data)
             except:
                 pass
 
@@ -68,6 +92,7 @@ class Client:
                 pass
 
     def terminate_session(self):
+
         self.s.close()
 
 def login_screen():
@@ -115,7 +140,7 @@ def login_screen():
 
     login_screen.mainloop()
 
-def App_screen(client, name):
+def App_screen(client, name, users):
     app_screen = tk.Tk()
 
     app_canvas = tk.Canvas(app_screen, width=400, height=500)
@@ -130,9 +155,24 @@ def App_screen(client, name):
     name_label.config(font=('helvetica bold', 20), bg="gold")
     app_canvas.create_window(100, 100, window=name_label)
 
-    ip_label = tk.Label(app_screen, text=name)
-    ip_label.config(font=('helvetica', 10), bg="light goldenrod")
-    app_canvas.create_window(100, 140, window=ip_label)
+    i = 140
+
+    for user in users:
+        if user == name:
+            ip_label = tk.Label(app_screen, text=user)
+            ip_label.config(font=('helvetica', 10), bg="steel blue")
+            app_canvas.create_window(100, i, window=ip_label)
+            i += 25
+            continue
+
+        ip_label = tk.Label(app_screen, text=user)
+        ip_label.config(font=('helvetica', 10), bg="light goldenrod")
+        app_canvas.create_window(100, i, window=ip_label)
+        i += 25
+
+    #ip_label = tk.Label(app_screen, text=name)
+    #ip_label.config(font=('helvetica', 10), bg="light goldenrod")
+    #app_canvas.create_window(100, 140, window=ip_label)
 
     def close_app():
         client.terminate_session() # stop session with the server
@@ -143,6 +183,8 @@ def App_screen(client, name):
     app_canvas.create_window(100, 450, window=close_app_button)
 
     app_screen.mainloop()
+
+    return app_screen
 
 def main():
     login_screen()
