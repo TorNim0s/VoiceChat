@@ -1,5 +1,4 @@
 import socket
-# ma omer
 import threading
 
 
@@ -21,7 +20,7 @@ class Server:
         self.accept_connections()
 
     def accept_connections(self):
-        self.s.listen(100)
+        self.s.listen(100) # maximum client to listen
 
         print('Running on IP: ' + self.ip)
         print('Running on port: ' + str(self.port))
