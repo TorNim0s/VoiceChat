@@ -56,7 +56,7 @@ class Client:
 
         send_thread = threading.Thread(target=self.send_data_to_server).start()
 
-        update_app_thread = threading.Thread(target=self.update_app_screen).start()
+        #update_app_thread = threading.Thread(target=self.update_app_screen).start()
 
         self.app = App_screen(self, self.name, self.users)
 
@@ -64,9 +64,7 @@ class Client:
         while True:
             try:
                 data = self.s.recv(1024).decode()
-                print(data)
                 if ("accounts" in data):
-                    print("test2")
                     self.users = data.split("|")
                     self.users.remove("accounts")
                     self.app.destroy
@@ -78,8 +76,7 @@ class Client:
         while True:
             try:
                 data = self.s.recv(1024)
-                if ("accounts" not in data.decode()):
-                    self.playing_stream.write(data)
+                self.playing_stream.write(data)
             except:
                 pass
 
@@ -136,7 +133,7 @@ def login_screen():
         client = Client(ip, port, canvas1, login_screen, name)
 
     button1 = tk.Button(text='Connect to server', command=make_connection)
-    canvas1.create_window(100, 450, window=button1)
+    canvas1.create_window(200, 240, window=button1)
 
     login_screen.mainloop()
 
