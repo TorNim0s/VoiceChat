@@ -60,15 +60,12 @@ class Client:
 
     def update_app_screen(self, data):
         #try:
-        print("Got Users")
         self.app.printtest()
         data = data.split("|")
-        print(data)
+        print(data) # debug
         self.users = data
-        print(self.users)
-        print("Start Destroy")
+        print(self.users) #debug
         self.app.destroy_app()
-        print("Destroyed")
         #self.app = App_screen(self, self.name, self.users)
         #print("Made new")
         #except:
@@ -184,12 +181,7 @@ class App_screen:
         self.app_canvas.create_window(100, 450, window=close_app_button)
 
     def destroy_app(self):
-        print("[+] Debug1 - DESTROY 1")
         self.app_screen.destroy()
-        print("[+] Debug1 - DESTROY 2")
-
-    def printtest(self):
-        print("hello")
 
 def main():
     login_screen()
