@@ -40,7 +40,9 @@ class Server:
 
             data = "accounts|" + "|".join(clients)
 
-            c.send(data.encode());
+            c.send(data.encode())
+
+            self.broadcast(c, data.encode())
 
             threading.Thread(target=self.handle_client, args=(c, addr,)).start()
 
